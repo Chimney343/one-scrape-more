@@ -177,9 +177,9 @@ class PoliteFetcher:
         if response.status == 200:
             self.robots.parse(response.body.decode("utf-8", "replace").splitlines())
         elif response.status in (401, 403):
-            self.robots.disallow_all = True
+            self.robots.disallow_all = True  # type: ignore[attr-defined]
         else:
-            self.robots.allow_all = True
+            self.robots.allow_all = True  # type: ignore[attr-defined]
         self.robots.modified()
         crawl_delay = self.robots.crawl_delay(cfg.user_agent)
         if crawl_delay:

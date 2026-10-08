@@ -1,6 +1,7 @@
 # One Day More (onedaymore.pl) nutrition scraper.
 #
 # List recipes:        just
+# Install the env:     just sync
 # Full fresh download: just download you@example.com
 # Recommended window:  01:00-06:00 Europe/Warsaw
 
@@ -15,22 +16,34 @@ out_dir := "out"
 default:
     @just --list
 
+# Create/update the uv-managed virtualenv and uv.lock
+sync:
+    uv sync
+
 # Crawl every product page, re-fetching even cached pages
 download contact=contact_email max=max_requests wait=delay:
-    python odm_scraper.py --contact {{contact}} --refresh --max-requests {{max}} --delay {{wait}} --out {{out_dir}}
+    uv run python odm_scraper.py --contact {{contact}} --refresh --max-requests {{max}} --delay {{wait}} --out {{out_dir}}
 
 # Resume an interrupted crawl, reusing cached pages
 resume contact=contact_email max=max_requests wait=delay:
-    python odm_scraper.py --contact {{contact}} --max-requests {{max}} --delay {{wait}} --out {{out_dir}}
+    uv run python odm_scraper.py --contact {{contact}} --max-requests {{max}} --delay {{wait}} --out {{out_dir}}
 
 # Run the test suite
 test:
-    python -m pytest -q
+    uv run pytest -q
 
 # Lint and check formatting
 lint:
-    ruff check .
-    ruff format --check .
+    uv run ruff check .
+    uv run ruff format --check .
+
+# Auto-format the source
+fmt:
+    uv run ruff format .
+
+# Static type check
+typecheck:
+    uv run mypy odm_scraper.py
 
 # Delete scraped output and the HTTP cache
 clean:
